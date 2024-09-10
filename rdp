@@ -1,0 +1,25 @@
+When you're using Remote Desktop Protocol (RDP) to connect to a Windows machine, the format you use for the domain depends on the network setup and whether you're connecting to a machine in a domain or a workgroup. Here are the common formats:
+
+For a domain-joined computer:
+
+<test>
+domain\username
+</test>
+or
+<test>
+username@domain.com
+</test>
+
+For a computer in a workgroup or local account:
+
+<test>
+.\username
+</test>
+or just the username by itself.
+
+For a specific computer name:
+
+<test>
+computername\username
+</test>
+The backslash () is more commonly used in Windows environments, especially for older systems. The "@" format (user principal name) is also widely supported and is often used in more modern setups, particularly those integrated with Azure AD.
