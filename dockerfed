@@ -1,0 +1,73 @@
+# Use Amazon Linux 2 as the base image
+FROM amazonlinux:2
+
+# Install system dependencies
+RUN yum update -y && \
+    yum install -y git \
+                   memcached \
+                   amazon-linux-extras
+
+# Install Redis
+RUN amazon-linux-extras install redis6 -y
+
+# Install PostgreSQL
+RUN amazon-linux-extras install postgresql14 -y
+
+# Install MongoDB
+RUN echo "[mongodb-org-6.0]" > /etc/yum.repos.d/mongodb-org-6.0.repo && \
+    echo "name=MongoDB Repository" >> /etc/yum.repos.d/mongodb-org-6.0.repo && \
+    echo "baseurl=https://repo.mongodb.org/yum/amazon/2/mongodb-org/6.0/x86_64/" >> /etc/yum.repos.d/mongodb-org-6.0.repo && \
+    echo "gpgcheck=1" >> /etc/yum.repos.d/mongodb-org-6.0.repo && \
+    echo "enabled=1" >> /etc/yum.repos.d/mongodb-org-6.0.repo && \
+    echo "gpgkey=https://www.mongodb.org/static/pgp/server-6.0.asc" >> /etc/yum.repos.d/mongodb-org-6.0.repo && \
+    yum install -y mongodb-org
+
+# Install Elasticsearch
+RUN rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch && \
+    echo "[elasticsearch]" > /etc/yum.repos.d/elasticsearch.repo && \
+    echo "name=Elasticsearch repository for 7.x packages" >> /etc/yum.repos.d/elasticsearch.repo && \
+    echo "baseurl=https://artifacts.elastic.co/packages/7.x/yum" >> /etc/yum.repos.d/elasticsearch.repo && \
+    echo "gpgcheck=1" >> /etc/yum.repos.d/elasticsearch.repo && \
+    echo "gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch" >> /etc/yum.repos.d/elasticsearch.repo && \
+    echo "enabled=0" >> /etc/yum.repos.d/elasticsearch.repo && \
+    echo "autorefresh=1" >> /etc/yum.repos.d/elasticsearch.repo && \
+    echo "type=rpm-md" >> /etc/yum.repos.d/elasticsearch.repo && \
+    yum install --enablerepo=elasticsearch elasticsearch -y
+
+# Install RabbitMQ
+RUN yum install -y rabbitmq-server
+
+# Install Java (for Kafka)
+RUN amazon-linux-extras install java-openjdk11 -y
+
+# Install Kafka
+RUN wget https://downloads.apache.org/kafka/3.4.0/kafka_2.13-3.4.0.tgz && \
+    tar -xzf kafka_2.13-3.4.0.tgz && \
+    mv kafka_2.13-3.4.0 /opt/kafka && \
+    rm kafka_2.13-3.4.0.tgz
+
+# Install Nginx
+RUN amazon-linux-extras install nginx1 -y
+
+# Copy the application binaries and configuration
+COPY root-app /app/root-app
+COPY lookup-app /app/lookup-app
+COPY server.ini /app/server.ini
+
+# Set the working directory
+WORKDIR /app
+
+# Expose necessary ports
+EXPOSE 80 11211 6379 5432 27017 9200 5672 9092 8080
+
+# Start services and run the application
+CMD service memcached start && \
+    service redis start && \
+    service postgresql start && \
+    service mongod start && \
+    service elasticsearch start && \
+    service rabbitmq-server start && \
+    /opt/kafka/bin/zookeeper-server-start.sh -daemon /opt/kafka/config/zookeeper.properties && \
+    /opt/kafka/bin/kafka-server-start.sh -daemon /opt/kafka/config/server.properties && \
+    service nginx start && \
+    ./root-app & ./lookup-app
