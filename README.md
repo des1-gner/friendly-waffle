@@ -2,7 +2,7 @@
 Just a boring list
 
 https://docs.aws.amazon.com/AmazonS3/latest/userguide/security_iam_service-with-iam.html
-
+DO S3 FIRST, OTHERWISE IS FUkcea
 
 # Update package lists
 sudo yum update -y
