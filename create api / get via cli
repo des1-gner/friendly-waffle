@@ -1,0 +1,17 @@
+# Create an API
+api_id=$(aws apigateway create-rest-api --name "MyAPI" --query 'id' --output text)
+
+# Get the root resource ID
+root_resource_id=$(aws apigateway get-resources --rest-api-id $api_id --query 'items[0].id' --output text)
+
+# Create a resource
+resource_id=$(aws apigateway create-resource --rest-api-id $api_id --parent-id $root_resource_id --path-part "myresource" --query 'id' --output text)
+
+# Create a GET method
+aws apigateway put-method --rest-api-id $api_id --resource-id $resource_id --http-method GET --authorization-type "NONE"
+
+# Set up the integration with your backend
+aws apigateway put-integration --rest-api-id $api_id --resource-id $resource_id --http-method GET --type HTTP_PROXY --integration-http-method GET --uri http://example.com/path
+
+# Deploy the API
+aws apigateway create-deployment --rest-api-id $api_id --stage-name prod
