@@ -1,0 +1,17 @@
+# First, transfer the schema.sql file to the remote server
+scp /path/to/local/schema.sql ec2-user@your-ec2-instance:/home/ec2-user/schema.sql
+
+# Then, SSH into your EC2 instance
+ssh ec2-user@your-ec2-instance
+
+# Once you're in the EC2 instance, apply the schema to your database
+mysql -u myuser -p mydb < /home/ec2-user/schema.sql
+
+# If you prefer to enter MySQL and then source the file:
+mysql -u myuser -p
+USE mydb;
+SOURCE /home/ec2-user/schema.sql;
+EXIT;
+
+# Exit the SSH session
+exit
