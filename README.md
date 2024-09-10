@@ -1,6 +1,9 @@
 # friendly-waffle
 Just a boring list
 
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/security_iam_service-with-iam.html
+
+
 # Update package lists
 sudo yum update -y
 
