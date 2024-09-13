@@ -1,6 +1,20 @@
 # friendly-waffle
 Just a boring list
 
+
+guard duty tags and status and findings destination
+deletion protextion
+security geoups local
+codepipeline
+tagging
+vpc tags
+if says ssm remove ssh
+insights
+logging
+codedeploy
+lambda tags
+endpoints
+
 https://docs.aws.amazon.com/AmazonS3/latest/userguide/security_iam_service-with-iam.html
 DO S3 FIRST, OTHERWISE IS FUkcea
 
